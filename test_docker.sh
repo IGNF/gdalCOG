@@ -1,13 +1,25 @@
 #!/bin/bash
-INPUT_DIR=data/raster
-OUTPUT_DIR=data/labo
-FILENAME="COG_test"
+VERSION=`cat VERSION.md`
+
+# Parameters
+INPUT_DIR=./data/raster
+OUTPUT_DIR=./data/labo
+FILENAME="COG_test_docker_real"
 EXTENSION="tif"
 EPSG="epsg:2154"
 
+# Temporary folder
+TEMP="tmp"
+
+# Creates output folder
 mkdir $OUTPUT_DIR -p
 
-./script/gdal_COG.sh -i $INPUT_DIR -o $OUTPUT_DIR -p $EPSG -f $FILENAME -e $EXTENSION
+# Docker command
+docker run --rm \
+-v $INPUT_DIR:/input \
+-v $OUTPUT_DIR:/output \
+lidar_hd/cog:$VERSION \
+./gdalCOG/script/gdal_COG.sh -i /input -o /output -p $EPSG -f $FILENAME -e $EXTENSION
 
 # path to test
 PATH_TMP=$OUTPUT_DIR/tmp
@@ -32,8 +44,8 @@ else
     echo "ERROR : COG file $PATH_COG DOESN'T exist."
 fi
 
-# remove output
+# Delete output
 echo Delete output
-rm -r $OUTPUT_DIR
+rm -f -r $OUTPUT_DIR
 
 echo END.

@@ -6,7 +6,7 @@ Ce répertoire permet de créer un COG avec gdal en enchaînant les commandes `g
 
 ## Utilisation
 
-Si utilisation directe : linux. Sinon utiliser avec l'image docker.
+Si utilisation directe : linux. Sinon utiliser avec l'image docker associée.
 
 ### Utilisation directe
 
@@ -18,11 +18,11 @@ Pour voir tous les paramètres :
 
 Paramètres :
 
-    -i input directory
-    -o output directory
+    -i input (dossier en entrée contenant les rasters)
+    -o output (dossier en sortie)
     -p projection (défaut : "epsg:2154")
-    -e extension des fichiers en entrée (défaut : ".tif")
-    -f nom fichier en sortie (défaut : "COG")
+    -e extension (extension des rasters en entrée) (défaut : "tif")
+    -f filename (nom du fichier en sortie) (défaut : "COG")
 
 Commande complète :
 
@@ -31,11 +31,35 @@ Commande complète :
 
 ### Utilisation avec docker
 
-A faire.
+Cloner le répertoire.
 
-### Test
+Se placer dans le dossier `docker` et construire l'image `./build.sh`.
 
-A la racine, lancer `./test.sh`
+Lancer le script `gdal_COG.sh` sous docker. 
+
+Exemple avec les mêmes paramètres que l'exemple précédent :
+
+`docker run --rm \`
+
+`-v $INPUT_DIR:input \`
+
+`-v $OUTPUT_DIR:output \`
+
+`lidar_hd/cog:$VERSION \`
+
+`./script/gdal_COG.sh -i /input -o /output -p $EPSG -f $FILENAME -e $EXTENSION`
+
+### Tests
+
+ Test sans docker : à la racine, lancer `./test.sh`.
+ 
+ Test avec docker : après avoir créé l'image docker, lancer à la racine `./test_docker.sh`.
+
+### Déploiement sur le nexus ign
+
+Se placer dans le dossier `docker` :
+
+`./deploy.sh`
 
 ### Licence
 

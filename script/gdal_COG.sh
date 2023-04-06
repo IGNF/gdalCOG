@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 # Default parameters
-INPUT_DIR="/input"
-OUTPUT_DIR="/output"
+INPUT_DIR=None
+OUTPUT_DIR=None
 EPSG="epsg:2154"
 EXTENSION="tif"
 FILENAME="COG"
@@ -12,7 +12,9 @@ FILENAME="COG"
 TEMP="tmp"
 
 USAGE="""
-Usage ./main.sh -i INPUT_DIR -o OUTPUT_DIR -p EPSG -e EXTENSION -f FILENAME\n
+Usage ./gdal_COG.sh -i INPUT_DIR -o OUTPUT_DIR -p EPSG -e EXTENSION -f FILENAME\n\n
+Needed\n    -i INPUT_DIR\n    -o OUTPUT_DIR\n
+Optional\n    -p EPSG (default epsg:2154)\n   -e EXTENSION (default .tif)\n   -f FILENAME (default COG)\n
 """
 # Parse arguments in order to possibly overwrite paths
 while getopts "h?i:o:p:e:f:" opt; do
@@ -34,6 +36,25 @@ while getopts "h?i:o:p:e:f:" opt; do
   esac
 done
 
+# Verify options in arguments
+if [ $OPTIND -eq 1 ]; then 
+    echo "No options were passed." 
+    echo -e ${USAGE}
+    exit 2 ; 
+fi
+
+if [ $INPUT_DIR = None ]; then
+    echo "No input were passed."
+    echo -e ${USAGE}
+    exit 2;
+fi
+
+if [ $OUTPUT_DIR = None ]; then
+    echo "No output were passed."
+    echo -e ${USAGE}
+    exit 2;
+fi
+
 # Creates temporary folder
 mkdir $OUTPUT_DIR/$TEMP -p
 
@@ -42,10 +63,10 @@ echo Create list of .$EXTENSION
 ls -d $INPUT_DIR/*.$EXTENSION > $OUTPUT_DIR/$TEMP/list.txt
 
 if [ ! -s "$OUTPUT_DIR/$TEMP/list.txt" ]; then
-    echo "File is empty"
-    exit 0 
+    echo "File is empty."
+    exit 2 
 else
-    echo "File is not empty"
+    echo "File is not empty."
 fi
 
 # VRT

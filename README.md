@@ -2,7 +2,7 @@
 
 ## Présentation
 
-Ce répertoire permet de créer un COG avec gdal en enchaînant les commandes `gdalbuildvrt` et `gdal_translate`.
+Ce répertoire permet de créer un COG avec gdal en enchaînant les commandes (`gdalwarp` si nécessaire) `gdalbuildvrt` et `gdal_translate`.
 
 ## Utilisation
 
@@ -23,10 +23,21 @@ Paramètres :
     -p projection (défaut : "epsg:2154")
     -e extension (extension des rasters en entrée) (défaut : "tif")
     -f filename (nom du fichier en sortie) (défaut : "COG")
+    -w gdalwarp (étape optionnelle) (défaut : 0 i.e non activée)
 
-Commande complète :
+Commande complète (par défaut sans gdalwarp):
 
 `./script/gdal_COG.sh -i $INPUT_DIR -o $OUTPUT_DIR -p $EPSG -f $FILENAME -e $EXTENSION`
+
+### Cas particulier : utilisation gdalwarp
+
+L'utilisation de `gdalwarp` en début de chaîne permet de gérer le cas où l'origine des coordonnées se situe en bas à gauche (lower-left) de l'image. En effet, `gdalbuildvrt` nécessite que l'origine des coordonnées se situe en haut à gauche (upper-left) de l'image.
+
+Pour utiliser cette option, il faut rajouter `-w` à la commande.
+
+Commande complète (avec gdalwarp):
+
+`./script/gdal_COG.sh -i $INPUT_DIR -o $OUTPUT_DIR -p $EPSG -f $FILENAME -e $EXTENSION -w`
 
 
 ### Utilisation avec docker
@@ -49,11 +60,14 @@ Exemple avec les mêmes paramètres que l'exemple précédent :
 
 `./script/gdal_COG.sh -i /input -o /output -p $EPSG -f $FILENAME -e $EXTENSION`
 
+
 ### Tests
 
  Test sans docker : à la racine, lancer `./test.sh`.
  
  Test avec docker : après avoir créé l'image docker, lancer à la racine `./test_docker.sh`.
+
+ Test avec l'étape gdalwarp : à la racine, lancer `./test_warp.sh`.
 
 ### Déploiement sur le nexus ign
 

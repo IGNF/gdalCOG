@@ -82,9 +82,9 @@ fi
 
 # List of tif
 echo Step 1/3 : Create list of $EXTENSION
-ls -d $INPUT_DIR/*.$EXTENSION > $OUTPUT_DIR/$TEMP/list.txt
+ls -d $INPUT_DIR/*.$EXTENSION > $OUTPUT_DIR/$TEMP/$FILENAME.txt
 
-if [ ! -s "$OUTPUT_DIR/$TEMP/list.txt" ]; then
+if [ ! -s "$OUTPUT_DIR/$TEMP/$FILENAME.txt" ]; then
     echo "File is empty."
     exit 2 
 else
@@ -93,7 +93,7 @@ fi
 
 # VRT
 echo Step 2/3 : Build VRT with gdalbuildvrt
-gdalbuildvrt -input_file_list $OUTPUT_DIR/$TEMP/list.txt $OUTPUT_DIR/$TEMP/VRT.vrt
+gdalbuildvrt -input_file_list $OUTPUT_DIR/$TEMP/$FILENAME.txt $OUTPUT_DIR/$TEMP/$FILENAME.vrt
 
 # COG
 echo Step 3/3 : Build COG with gdal_translate
@@ -108,9 +108,5 @@ gdal_translate \
 -co PREDICTOR=YES \
 -a_srs $EPSG \
 -of COG \
-$OUTPUT_DIR/$TEMP/VRT.vrt \
+$OUTPUT_DIR/$TEMP/$FILENAME.vrt \
 $OUTPUT_DIR/$FILENAME.$EXTENSION
-
-# Deletes contents of temporary folder
-rm $OUTPUT_DIR/$TEMP/*.txt
-rm $OUTPUT_DIR/$TEMP/*.vrt

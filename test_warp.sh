@@ -11,6 +11,9 @@ mkdir $OUTPUT_DIR -p
 
 # path to test
 PATH_TMP=$OUTPUT_DIR/tmp
+PATH_WARP=$PATH_TMP/warp
+PATH_WARP_FILE1=$PATH_WARP/test_data_0000_0000_LA93_IGN69.tif
+PATH_WARP_FILE2=$PATH_WARP/test_data_0000_0001_LA93_IGN69.tif
 PATH_COG=$OUTPUT_DIR/$FILENAME.$EXTENSION
 
 # existence folder output
@@ -18,22 +21,52 @@ if [ -d $OUTPUT_DIR ]; then
     echo "OK : Output folder $OUTPUT_DIR exists."
 else
     echo "ERROR : Output folder $OUTPUT_DIR DOESN'T exist."
+    exit 1
 fi
 # existence folder tmp
 if [ -d $PATH_TMP ]; then
     echo "OK : Temporary file $PATH_TMP exists."
 else
     echo "ERROR : Temporary file $PATH_TMP DOESN'T exist."
+    exit 1
+fi
+# existence folder warp
+if [ -d $PATH_WARP ]; then
+    echo "OK : Temporary file $PATH_WARP exists."
+else
+    echo "ERROR : Temporary file $PATH_WARP DOESN'T exist."
+    exit 1
+fi
+# existence files after warp
+if [ -f $PATH_WARP_FILE1 ]; then
+    echo "OK : Temporary file $PATH_WARP_FILE1 exists."
+else
+    echo "ERROR : Temporary file $PATH_WARP_FILE1 DOESN'T exist."
+    exit 1
+fi
+if [ -f $PATH_WARP_FILE2 ]; then
+    echo "OK : Temporary file $PATH_WARP_FILE2 exists."
+else
+    echo "ERROR : Temporary file $PATH_WARP_FILE2 DOESN'T exist."
+    exit 1
 fi
 # existence file COG
 if [ -f $PATH_COG ]; then
     echo "OK : COG file $PATH_COG exists."
 else 
     echo "ERROR : COG file $PATH_COG DOESN'T exist."
+    exit 1
 fi
 
 # remove output
 echo Delete output
-rm -r $OUTPUT_DIR
+rm -f $PATH_TMP/$FILENAME.txt
+rm -f $PATH_TMP/$FILENAME.vrt
+rm -f $PATH_WARP/test_data_0000_0000_LA93_IGN69.tif
+rm -f $PATH_WARP/test_data_0000_0001_LA93_IGN69.tif
+rm -d $PATH_WARP
+rm -d $PATH_TMP
+rm -f $OUTPUT_DIR/$FILENAME.tif
+rm -d $OUTPUT_DIR
 
 echo END.

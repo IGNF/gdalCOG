@@ -1,28 +1,18 @@
 #!/bin/bash
-VERSION=`cat VERSION.md`
-
-# Parameters
-INPUT_DIR=./data/raster
-OUTPUT_DIR=./data/labo
-FILENAME="COG_test_docker_real"
+INPUT_DIR=data/raster
+OUTPUT_DIR=data/labo
+FILENAME="COG_test"
 EXTENSION="tif"
 EPSG="epsg:2154"
 
-# Temporary folder
-TEMP="tmp"
-
-# Creates output folder
 mkdir $OUTPUT_DIR -p
 
-# Docker command
-docker run --rm \
--v $INPUT_DIR:/input \
--v $OUTPUT_DIR:/output \
-lidar_hd/cog:$VERSION \
-./gdalCOG/script/gdal_COG.sh -i /input -o /output -p $EPSG -f $FILENAME -e $EXTENSION -r -w
+./script/gdal_COG.sh -i $INPUT_DIR -o $OUTPUT_DIR -p $EPSG -f $FILENAME -e $EXTENSION -r
 
 # path to test
 PATH_TMP=$OUTPUT_DIR/tmp
+PATH_TXT=$PATH_TMP/$FILENAME.txt
+PATH_VRT=$PATH_TMP/$FILENAME.vrt
 PATH_COG=$OUTPUT_DIR/$FILENAME.$EXTENSION
 
 # existence folder output
@@ -39,18 +29,18 @@ else
     echo "ERROR : Temporary file $PATH_TMP DOESN'T exist."
     exit 1
 fi
-# existence file txt
+# not existence file txt
 if [ -f $PATH_TXT ]; then
-    echo "OK : COG file $PATH_TXT exists."
+    echo "ERROR : COG file $PATH_TXT exists."
 else 
-    echo "ERROR : COG file $PATH_TXT DOESN'T exist."
+    echo "OK : COG file $PATH_TXT DOESN'T exist."
     exit 1
 fi
-# existence file vrt
+# not existence file vrt
 if [ -f $PATH_VRT ]; then
-    echo "OK : COG file $PATH_VRT exists."
+    echo "ERROR : COG file $PATH_VRT exists."
 else 
-    echo "ERROR : COG file $PATH_VRT DOESN'T exist."
+    echo "OK : COG file $PATH_VRT DOESN'T exist."
     exit 1
 fi
 # existence file COG
@@ -60,7 +50,5 @@ else
     echo "ERROR : COG file $PATH_COG DOESN'T exist."
     exit 1
 fi
-
-# Outputs can't be deleted by standard user because in docker folders and files are created as root.
 
 echo END.

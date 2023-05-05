@@ -7,54 +7,74 @@ OUTPUT_DIR=None
 EPSG="epsg:2154"
 EXTENSION="tif"
 FILENAME="COG"
-WARP=0
+USE_GDALWARP=0
+REMOVE_TMP_FILES=0
 
 # Temporary folder
 TEMP="tmp"
+WARP_FOLDER="warp"
 
-USAGE="""
-Usage ./gdal_COG.sh -i INPUT_DIR -o OUTPUT_DIR -p EPSG -e EXTENSION -f FILENAME\n\n
-Needed\n    -i INPUT_DIR\n    -o OUTPUT_DIR\n
-Optional\n    -p EPSG (default epsg:2154)\n   -e EXTENSION (default .tif)\n   -f FILENAME (default COG)\n   -w WARP (default without)\n
-"""
-# Parse arguments in order to possibly overwrite paths
-while getopts "h?i:o:p:e:f:w" opt; do
-  case "$opt" in
-    h|\?)
-      echo -e ${USAGE}
-      exit 0
-      ;;
-    i)  INPUT_DIR=${OPTARG}
-      ;;
-    o)  OUTPUT_DIR=${OPTARG}
-      ;;
-    p)  EPSG=${OPTARG}
-      ;;
-    e)  EXTENSION=${OPTARG}
-      ;;
-    f)  FILENAME=${OPTARG}
-      ;;
-    w)  WARP=1
-      ;;
+# Message help
+usage(){
+>&2 cat << EOF
+USAGE  : $0 --input INPUT_DIR --output OUTPUT_DIR --projection epsg:2154 --extension tif --filename COG_filename --warp
+    or : $0 --i INPUT_DIR --o OUTPUT_DIR --p epsg:2154 --e tif --f COG_filename --w 
+    or : $0 -i INPUT_DIR -o OUTPUT_DIR -p epsg:2154 -e tif -f COG_filename -w 
+Parameters details :
+Needed
+   [ -i | --input       (input directory)   ]
+   [ -o | --output      (output directory)  ]
+Optional
+   [ -p | --projection  (projection       -> default "epsg:2154") ] 
+   [ -e | --extension   (raster extension -> default "tif")       ]
+   [ -f | --filename    (output filename  -> default "COG")       ]
+   [ -w | --warp        (use of gdalwarp  -> default without)     ]
+   [ -r | --remove      (remove tmp files -> default without)     ]
+EOF
+exit 1
+}
+
+# Parse arguments
+PARSED_ARGUMENTS=$(getopt -o hi:o:p:e:f:wr --long input:,output:,help,projection:,extension:,filename:,warp,remove -- "$@")
+
+eval set -- ${PARSED_ARGUMENTS}
+while :
+do
+  case $1 in
+    -h | --help)        usage               ; shift   ;;
+    -i | --input)       INPUT_DIR="$2"      ; shift 2 ;;
+    -o | --output)      OUTPUT_DIR="$2"     ; shift 2 ;;
+    -p | --projection)  EPSG="$2"           ; shift 2 ;;
+    -e | --extension)   EXTENSION="$2"      ; shift 2 ;;
+    -f | --filename)    FILENAME="$2"       ; shift 2 ;;
+    -w | --warp)        USE_GDALWARP=1      ; shift   ;;
+    -r | --remove)      REMOVE_TMP_FILES=1  ; shift   ;;
+    # -- means the end of the arguments; drop this, and break out of the while loop
+    --) shift; break ;;
+    *) >&2 echo Unsupported option: $1
+       usage ;;
   esac
 done
 
-# Verify options in arguments
-if [ $OPTIND -eq 1 ]; then 
-    echo "No options were passed." 
-    echo -e ${USAGE}
-    exit 2 ; 
+# Verify parameters in arguments
+if [ $# -gt 0 ]; then
+    echo "ERROR : Error in parameters"
+    echo
+    usage
+    exit 2;
 fi
 
 if [ $INPUT_DIR = None ]; then
-    echo "No input were passed."
-    echo -e ${USAGE}
+    echo "ERROR : No input were passed."
+    echo
+    usage
     exit 2;
 fi
 
 if [ $OUTPUT_DIR = None ]; then
-    echo "No output were passed."
-    echo -e ${USAGE}
+    echo "ERROR : No output were passed."
+    echo
+    usage
     exit 2;
 fi
 
@@ -66,10 +86,10 @@ echo Build a COG named : ${FILENAME}.${EXTENSION}
 mkdir $OUTPUT_DIR/$TEMP -p
 
 # Preparation of tif with gdalwarp if necessary
-if [ $WARP = 1 ]; then
+if [ $USE_GDALWARP = 1 ]; then
   echo Step 0/3 : Prepare ${EXTENSION} with gdalwarp
   # Create subtree
-  NEW_INPUT_DIR=$OUTPUT_DIR/$TEMP/warp
+  NEW_INPUT_DIR=$OUTPUT_DIR/$TEMP/$WARP_FOLDER
   mkdir $NEW_INPUT_DIR -p
   # Use gdalwarp
   for filepath in $INPUT_DIR/*.$EXTENSION ; do
@@ -82,9 +102,9 @@ fi
 
 # List of tif
 echo Step 1/3 : Create list of $EXTENSION
-ls -d $INPUT_DIR/*.$EXTENSION > $OUTPUT_DIR/$TEMP/list.txt
+ls -d $INPUT_DIR/*.$EXTENSION > $OUTPUT_DIR/$TEMP/$FILENAME.txt
 
-if [ ! -s "$OUTPUT_DIR/$TEMP/list.txt" ]; then
+if [ ! -s "$OUTPUT_DIR/$TEMP/$FILENAME.txt" ]; then
     echo "File is empty."
     exit 2 
 else
@@ -93,7 +113,7 @@ fi
 
 # VRT
 echo Step 2/3 : Build VRT with gdalbuildvrt
-gdalbuildvrt -input_file_list $OUTPUT_DIR/$TEMP/list.txt $OUTPUT_DIR/$TEMP/VRT.vrt
+gdalbuildvrt -input_file_list $OUTPUT_DIR/$TEMP/$FILENAME.txt $OUTPUT_DIR/$TEMP/$FILENAME.vrt
 
 # COG
 echo Step 3/3 : Build COG with gdal_translate
@@ -108,9 +128,17 @@ gdal_translate \
 -co PREDICTOR=YES \
 -a_srs $EPSG \
 -of COG \
-$OUTPUT_DIR/$TEMP/VRT.vrt \
+$OUTPUT_DIR/$TEMP/$FILENAME.vrt \
 $OUTPUT_DIR/$FILENAME.$EXTENSION
 
 # Deletes contents of temporary folder
-rm $OUTPUT_DIR/$TEMP/*.txt
-rm $OUTPUT_DIR/$TEMP/*.vrt
+if [ $REMOVE_TMP_FILES = 1 ]; then
+  echo Delete tmp files 
+  rm -f $OUTPUT_DIR/$TEMP/$FILENAME.txt
+  rm -f $OUTPUT_DIR/$TEMP/$FILENAME.vrt
+  if [ $USE_GDALWARP = 1 ]; then
+    rm -f $OUTPUT_DIR/$TEMP/$WARP_FOLDER/*.$EXTENSION
+  fi
+fi
+
+echo END.

@@ -62,11 +62,11 @@ fi
 echo Delete output
 rm -f $PATH_TMP/$FILENAME.txt
 rm -f $PATH_TMP/$FILENAME.vrt
-rm -f $PATH_WARP/test_data_0000_0000_LA93_IGN69.tif
-rm -f $PATH_WARP/test_data_0000_0001_LA93_IGN69.tif
+rm -f $PATH_WARP/test_data_0000_0000_LA93_IGN69.$EXTENSION
+rm -f $PATH_WARP/test_data_0000_0001_LA93_IGN69.$EXTENSION
 rm -d $PATH_WARP
 rm -d $PATH_TMP
-rm -f $OUTPUT_DIR/$FILENAME.tif
+rm -f $OUTPUT_DIR/$FILENAME.$EXTENSION
 rm -d $OUTPUT_DIR
 
 echo END.

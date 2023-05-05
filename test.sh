@@ -31,16 +31,16 @@ else
 fi
 # existence file txt
 if [ -f $PATH_TXT ]; then
-    echo "OK : COG file $PATH_TXT exists."
+    echo "OK : TXT file $PATH_TXT exists."
 else 
-    echo "ERROR : COG file $PATH_TXT DOESN'T exist."
+    echo "ERROR : TXT file $PATH_TXT DOESN'T exist."
     exit 1
 fi
 # existence file vrt
 if [ -f $PATH_VRT ]; then
-    echo "OK : COG file $PATH_VRT exists."
+    echo "OK : VRT file $PATH_VRT exists."
 else 
-    echo "ERROR : COG file $PATH_VRT DOESN'T exist."
+    echo "ERROR : VRT file $PATH_VRT DOESN'T exist."
     exit 1
 fi
 # existence file COG
@@ -55,7 +55,7 @@ fi
 echo Delete output
 rm -f $PATH_TMP/$FILENAME.txt
 rm -f $PATH_TMP/$FILENAME.vrt
-rm -f $OUTPUT_DIR/$FILENAME.tif
+rm -f $OUTPUT_DIR/$FILENAME.$EXTENSION
 rm -d $PATH_TMP
 rm -d $OUTPUT_DIR
 

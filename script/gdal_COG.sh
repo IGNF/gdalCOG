@@ -58,7 +58,7 @@ done
 
 # Verify parameters in arguments
 if [ $# -gt 0 ]; then
-    echo ERROR : Error in parameters
+    echo "ERROR : Error in parameters"
     echo
     usage
     exit 2;
@@ -137,7 +137,7 @@ if [ $REMOVE_TMP_FILES = 1 ]; then
   rm -f $OUTPUT_DIR/$TEMP/$FILENAME.txt
   rm -f $OUTPUT_DIR/$TEMP/$FILENAME.vrt
   if [ $USE_GDALWARP = 1 ]; then
-    rm -f $OUTPUT_DIR/$TEMP/$WARP_FOLDER/*.tif
+    rm -f $OUTPUT_DIR/$TEMP/$WARP_FOLDER/*.$EXTENSION
   fi
 fi
 

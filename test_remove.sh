@@ -31,17 +31,17 @@ else
 fi
 # not existence file txt
 if [ -f $PATH_TXT ]; then
-    echo "ERROR : COG file $PATH_TXT exists."
-else 
-    echo "OK : COG file $PATH_TXT DOESN'T exist."
+    echo "ERROR : TXT file $PATH_TXT exists."
     exit 1
+else 
+    echo "OK : TXT file $PATH_TXT DOESN'T exist."
 fi
 # not existence file vrt
 if [ -f $PATH_VRT ]; then
-    echo "ERROR : COG file $PATH_VRT exists."
-else 
-    echo "OK : COG file $PATH_VRT DOESN'T exist."
+    echo "ERROR : VRT file $PATH_VRT exists."
     exit 1
+else 
+    echo "OK : VRT file $PATH_VRT DOESN'T exist."
 fi
 # existence file COG
 if [ -f $PATH_COG ]; then

@@ -15,7 +15,7 @@ TEMP="tmp"
 mkdir $OUTPUT_DIR -p
 
 # Docker command
-docker run --rm \
+docker run --rm --userns=host \
 -v $INPUT_DIR:/input \
 -v $OUTPUT_DIR:/output \
 lidar_hd/cog:$VERSION \
@@ -23,6 +23,7 @@ lidar_hd/cog:$VERSION \
 
 # path to test
 PATH_TMP=$OUTPUT_DIR/tmp
+PATH_WARP=$PATH_TMP/warp
 PATH_COG=$OUTPUT_DIR/$FILENAME.$EXTENSION
 
 # existence folder output
@@ -41,16 +42,16 @@ else
 fi
 # existence file txt
 if [ -f $PATH_TXT ]; then
-    echo "OK : COG file $PATH_TXT exists."
+    echo "OK : TXT file $PATH_TXT exists."
 else 
-    echo "ERROR : COG file $PATH_TXT DOESN'T exist."
+    echo "ERROR : TXT file $PATH_TXT DOESN'T exist."
     exit 1
 fi
 # existence file vrt
 if [ -f $PATH_VRT ]; then
-    echo "OK : COG file $PATH_VRT exists."
+    echo "OK : VRT file $PATH_VRT exists."
 else 
-    echo "ERROR : COG file $PATH_VRT DOESN'T exist."
+    echo "ERROR : VRT file $PATH_VRT DOESN'T exist."
     exit 1
 fi
 # existence file COG
@@ -62,5 +63,13 @@ else
 fi
 
 # Outputs can't be deleted by standard user because in docker folders and files are created as root.
+# remove output
+echo Delete output files
+rm -f $PATH_TMP/$FILENAME.txt
+rm -f $PATH_TMP/$FILENAME.vrt
+rm -f $OUTPUT_DIR/$FILENAME.$EXTENSION
+rm -f $PATH_WARP/test_data_0000_0000_LA93_IGN69.$EXTENSION
+rm -f $PATH_WARP/test_data_0000_0001_LA93_IGN69.$EXTENSION
 
+echo Delete manually the folder /data/labo in order to run other tests.
 echo END.

@@ -126,6 +126,7 @@ gdal_translate \
 -co BIGTIFF=YES \
 -co COMPRESS=LZW \
 -co PREDICTOR=YES \
+-co NUM_THREADS=all_cpus \
 -a_srs $EPSG \
 -of COG \
 $OUTPUT_DIR/$TEMP/$FILENAME.vrt \

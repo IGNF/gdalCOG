@@ -9,6 +9,7 @@ EXTENSION="tif"
 FILENAME="COG"
 USE_GDALWARP=0
 REMOVE_TMP_FILES=0
+THREADS=1
 
 # Temporary folder
 TEMP="tmp"
@@ -30,12 +31,13 @@ Optional
    [ -f | --filename    (output filename  -> default "COG")       ]
    [ -w | --warp        (use of gdalwarp  -> default without)     ]
    [ -r | --remove      (remove tmp files -> default without)     ]
+   [ -m | --multithread (use all cpus     -> default without)     ]
 EOF
 exit 1
 }
 
 # Parse arguments
-PARSED_ARGUMENTS=$(getopt -o hi:o:p:e:f:wr --long input:,output:,help,projection:,extension:,filename:,warp,remove -- "$@")
+PARSED_ARGUMENTS=$(getopt -o hi:o:p:e:f:wrm --long input:,output:,help,projection:,extension:,filename:,warp,remove,multithread -- "$@")
 
 eval set -- ${PARSED_ARGUMENTS}
 while :
@@ -49,6 +51,7 @@ do
     -f | --filename)    FILENAME="$2"       ; shift 2 ;;
     -w | --warp)        USE_GDALWARP=1      ; shift   ;;
     -r | --remove)      REMOVE_TMP_FILES=1  ; shift   ;;
+    -m | --multithread) THREADS="all_cpus"  ; shift   ;;
     # -- means the end of the arguments; drop this, and break out of the while loop
     --) shift; break ;;
     *) >&2 echo Unsupported option: $1
@@ -126,6 +129,7 @@ gdal_translate \
 -co BIGTIFF=YES \
 -co COMPRESS=LZW \
 -co PREDICTOR=YES \
+-co NUM_THREADS=$THREADS \
 -a_srs $EPSG \
 -of COG \
 $OUTPUT_DIR/$TEMP/$FILENAME.vrt \

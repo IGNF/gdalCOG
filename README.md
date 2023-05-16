@@ -25,6 +25,7 @@ Paramètres :
     -f | --filename     (nom du fichier en sortie) (défaut : "COG")
     -w | --warp         (étape optionnelle : utilisation de gdalwarp) (défaut : non activée)
     -r | --remove       (supprime les fichiers et dossiers intermédiaires contenus dans `/tmp`) (défaut : non activée)
+    -m | --multithread  (choix d'utiliser tous les cpus disponibles pour la commande gdal_translate) (défaut : 1 cpu utilisé)
 
 Commande basique (avec toutes les options par défaut) :
 

@@ -86,13 +86,13 @@ echo
 echo Build a COG named : ${FILENAME}.${EXTENSION}
 
 # Creates temporary folder
-mkdir $OUTPUT_DIR/$TEMP -p
+mkdir $TEMP -p
 
 # Preparation of tif with gdalwarp if necessary
 if [ $USE_GDALWARP = 1 ]; then
   echo Step 0/3 : Prepare ${EXTENSION} with gdalwarp
   # Create subtree
-  NEW_INPUT_DIR=$OUTPUT_DIR/$TEMP/$WARP_FOLDER
+  NEW_INPUT_DIR=$TEMP/$WARP_FOLDER
   mkdir $NEW_INPUT_DIR -p
   # Use gdalwarp
   for filepath in $INPUT_DIR/*.$EXTENSION ; do
@@ -105,9 +105,9 @@ fi
 
 # List of tif
 echo Step 1/3 : Create list of $EXTENSION
-ls -d $INPUT_DIR/*.$EXTENSION > $OUTPUT_DIR/$TEMP/$FILENAME.txt
+ls -d $INPUT_DIR/*.$EXTENSION > $TEMP/$FILENAME.txt
 
-if [ ! -s "$OUTPUT_DIR/$TEMP/$FILENAME.txt" ]; then
+if [ ! -s "$TEMP/$FILENAME.txt" ]; then
     echo "File is empty."
     exit 2 
 else
@@ -116,7 +116,7 @@ fi
 
 # VRT
 echo Step 2/3 : Build VRT with gdalbuildvrt
-gdalbuildvrt -input_file_list $OUTPUT_DIR/$TEMP/$FILENAME.txt $OUTPUT_DIR/$TEMP/$FILENAME.vrt
+gdalbuildvrt -input_file_list $TEMP/$FILENAME.txt $TEMP/$FILENAME.vrt
 
 # COG
 echo Step 3/3 : Build COG with gdal_translate
@@ -132,17 +132,8 @@ gdal_translate \
 -co NUM_THREADS=$THREADS \
 -a_srs $EPSG \
 -of COG \
-$OUTPUT_DIR/$TEMP/$FILENAME.vrt \
+$TEMP/$FILENAME.vrt \
 $OUTPUT_DIR/$FILENAME.$EXTENSION
 
-# Deletes contents of temporary folder
-if [ $REMOVE_TMP_FILES = 1 ]; then
-  echo Delete tmp files 
-  rm -f $OUTPUT_DIR/$TEMP/$FILENAME.txt
-  rm -f $OUTPUT_DIR/$TEMP/$FILENAME.vrt
-  if [ $USE_GDALWARP = 1 ]; then
-    rm -f $OUTPUT_DIR/$TEMP/$WARP_FOLDER/*.$EXTENSION
-  fi
-fi
 
 echo END.

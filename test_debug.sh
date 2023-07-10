@@ -7,10 +7,11 @@ EPSG="epsg:2154"
 
 mkdir $OUTPUT_DIR -p
 
-./script/gdal_COG.sh -i $INPUT_DIR -o $OUTPUT_DIR -p $EPSG -f $FILENAME -e $EXTENSION
+./script/gdal_COG.sh -i $INPUT_DIR -o $OUTPUT_DIR -p $EPSG -f $FILENAME -e $EXTENSION -d
 
 # path to test
-PATH_TMP=tmp
+TMP=tmp
+PATH_TMP=$OUTPUT_DIR/tmp
 PATH_TXT=$PATH_TMP/$FILENAME.txt
 PATH_VRT=$PATH_TMP/$FILENAME.vrt
 PATH_COG=$OUTPUT_DIR/$FILENAME.$EXTENSION
@@ -30,11 +31,11 @@ else
     exit 1
 fi
 # non-existence other folder tmp
-if [ -d $OUTPUT_DIR/$PATH_TMP ]; then
-    echo "ERROR : Temporary file $OUTPUT_DIR/$PATH_TMP exists."
+if [ -d $TMP ]; then
+    echo "ERROR : Temporary file $TMP exists."
     exit 1
 else
-    echo "OK : Temporary file $OUTPUT_DIR/$PATH_TMP DOESN'T exist."
+    echo "OK : Temporary file $TMP DOESN'T exist."
 fi
 # existence file txt
 if [ -f $PATH_TXT ]; then

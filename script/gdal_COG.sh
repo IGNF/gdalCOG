@@ -10,6 +10,7 @@ FILENAME="COG"
 USE_GDALWARP=0
 REMOVE_TMP_FILES=0
 THREADS=1
+DEBUG=0
 
 # Temporary folder
 TEMP="tmp"
@@ -32,12 +33,13 @@ Optional
    [ -w | --warp        (use of gdalwarp  -> default without)     ]
    [ -r | --remove      (remove tmp files -> default without)     ]
    [ -m | --multithread (use all cpus     -> default without)     ]
+   [ -d | --debug       (access tmp files -> default without)     ]
 EOF
 exit 1
 }
 
 # Parse arguments
-PARSED_ARGUMENTS=$(getopt -o hi:o:p:e:f:wrm --long input:,output:,help,projection:,extension:,filename:,warp,remove,multithread -- "$@")
+PARSED_ARGUMENTS=$(getopt -o hi:o:p:e:f:wrmd --long input:,output:,help,projection:,extension:,filename:,warp,remove,multithread,debug -- "$@")
 
 eval set -- ${PARSED_ARGUMENTS}
 while :
@@ -52,6 +54,7 @@ do
     -w | --warp)        USE_GDALWARP=1      ; shift   ;;
     -r | --remove)      REMOVE_TMP_FILES=1  ; shift   ;;
     -m | --multithread) THREADS="all_cpus"  ; shift   ;;
+    -d | --debug)       DEBUG=1             ; shift   ;;
     # -- means the end of the arguments; drop this, and break out of the while loop
     --) shift; break ;;
     *) >&2 echo Unsupported option: $1
@@ -81,18 +84,32 @@ if [ $OUTPUT_DIR = None ]; then
     exit 2;
 fi
 
+# Defines tmp dir
+if [ $DEBUG = 0 ]; then
+    # Normal mode
+    TEMP_DIR=$TEMP
+    echo
+    echo Normal mode active : TEMP_DIR=$TEMP_DIR
+else
+    # Debug mode
+    TEMP_DIR=$OUTPUT_DIR/$TEMP
+    echo
+    echo Debug mode active : TEMP_DIR=$TEMP_DIR "(give access to tmp files)"
+fi
+
 # Info user
 echo
 echo Build a COG named : ${FILENAME}.${EXTENSION}
 
+
 # Creates temporary folder
-mkdir $TEMP -p
+mkdir $TEMP_DIR -p
 
 # Preparation of tif with gdalwarp if necessary
 if [ $USE_GDALWARP = 1 ]; then
   echo Step 0/3 : Prepare ${EXTENSION} with gdalwarp
   # Create subtree
-  NEW_INPUT_DIR=$TEMP/$WARP_FOLDER
+  NEW_INPUT_DIR=$TEMP_DIR/$WARP_FOLDER
   mkdir $NEW_INPUT_DIR -p
   # Use gdalwarp
   for filepath in $INPUT_DIR/*.$EXTENSION ; do
@@ -105,9 +122,9 @@ fi
 
 # List of tif
 echo Step 1/3 : Create list of $EXTENSION
-ls -d $INPUT_DIR/*.$EXTENSION > $TEMP/$FILENAME.txt
+ls -d $INPUT_DIR/*.$EXTENSION > $TEMP_DIR/$FILENAME.txt
 
-if [ ! -s "$TEMP/$FILENAME.txt" ]; then
+if [ ! -s "$TEMP_DIR/$FILENAME.txt" ]; then
     echo "File is empty."
     exit 2 
 else
@@ -116,7 +133,7 @@ fi
 
 # VRT
 echo Step 2/3 : Build VRT with gdalbuildvrt
-gdalbuildvrt -input_file_list $TEMP/$FILENAME.txt $TEMP/$FILENAME.vrt
+gdalbuildvrt -input_file_list $TEMP_DIR/$FILENAME.txt $TEMP_DIR/$FILENAME.vrt
 
 # COG
 echo Step 3/3 : Build COG with gdal_translate
@@ -132,7 +149,7 @@ gdal_translate \
 -co NUM_THREADS=$THREADS \
 -a_srs $EPSG \
 -of COG \
-$TEMP/$FILENAME.vrt \
+$TEMP_DIR/$FILENAME.vrt \
 $OUTPUT_DIR/$FILENAME.$EXTENSION
 
 

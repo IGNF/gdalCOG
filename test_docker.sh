@@ -22,7 +22,7 @@ lidar_hd/cog:$VERSION \
 ./gdalCOG/script/gdal_COG.sh -i /input -o /output -p $EPSG -f $FILENAME -e $EXTENSION -r -w
 
 # path to test
-PATH_TMP=$OUTPUT_DIR/tmp
+PATH_TMP=tmp
 PATH_WARP=$PATH_TMP/warp
 PATH_COG=$OUTPUT_DIR/$FILENAME.$EXTENSION
 
@@ -35,10 +35,10 @@ else
 fi
 # existence folder tmp
 if [ -d $PATH_TMP ]; then
-    echo "OK : Temporary file $PATH_TMP exists."
-else
-    echo "ERROR : Temporary file $PATH_TMP DOESN'T exist."
+    echo "ERROR : Temporary file $PATH_TMP exists but souldn't. It must only be created in docker container."
     exit 1
+else
+    echo "OK : Temporary file $PATH_TMP DOESN'T exist. Only exists in docker container."
 fi
 # existence file txt
 if [ -f $PATH_TXT ]; then

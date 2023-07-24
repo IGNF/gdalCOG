@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # Default parameters
@@ -12,7 +12,10 @@ REMOVE_TMP_FILES=0
 THREADS=1
 
 # Temporary folder
-TEMP="tmp"
+RANDOM_NUMBER=$RANDOM
+echo $RANDOM_NUMBER
+echo random number ${RANDOM_NUMBER}
+TEMP="tmp/tmp$RANDOM_NUMBER"
 WARP_FOLDER="warp"
 
 # Message help

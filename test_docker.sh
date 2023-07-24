@@ -19,7 +19,7 @@ docker run --rm --userns=host \
 -v $INPUT_DIR:/input \
 -v $OUTPUT_DIR:/output \
 lidar_hd/cog:$VERSION \
-./gdalCOG/script/gdal_COG.sh -i /input -o /output -p $EPSG -f $FILENAME -e $EXTENSION -r -w
+./gdalCOG/script/gdal_COG.sh -i /input -o /output -p $EPSG -f $FILENAME -e $EXTENSION
 
 # path to test
 PATH_TMP=$OUTPUT_DIR/tmp
@@ -63,13 +63,6 @@ else
 fi
 
 # Outputs can't be deleted by standard user because in docker folders and files are created as root.
-# remove output
-echo Delete output files
-rm -f $PATH_TMP/$FILENAME.txt
-rm -f $PATH_TMP/$FILENAME.vrt
-rm -f $OUTPUT_DIR/$FILENAME.$EXTENSION
-rm -f $PATH_WARP/test_data_0000_0000_LA93_IGN69.$EXTENSION
-rm -f $PATH_WARP/test_data_0000_0001_LA93_IGN69.$EXTENSION
 
 echo Delete manually the folder /data/labo in order to run other tests.
 echo END.

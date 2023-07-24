@@ -11,8 +11,9 @@ mkdir $OUTPUT_DIR -p
 
 # path to test
 PATH_TMP=$OUTPUT_DIR/tmp
-PATH_TXT=$PATH_TMP/$FILENAME.txt
-PATH_VRT=$PATH_TMP/$FILENAME.vrt
+PATH_SUBTMP=$PATH_TMP/tmp*
+PATH_TXT=$PATH_SUBTMP/$FILENAME.txt
+PATH_VRT=$PATH_SUBTMP/$FILENAME.vrt
 PATH_COG=$OUTPUT_DIR/$FILENAME.$EXTENSION
 
 # existence folder output
@@ -50,5 +51,14 @@ else
     echo "ERROR : COG file $PATH_COG DOESN'T exist."
     exit 1
 fi
+
+echo END.
+
+# remove output
+echo Delete output
+rm -d $PATH_SUBTMP
+rm -d $PATH_TMP
+rm -f $OUTPUT_DIR/$FILENAME.$EXTENSION
+rm -d $OUTPUT_DIR
 
 echo END.

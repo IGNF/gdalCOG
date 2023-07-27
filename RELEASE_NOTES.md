@@ -1,4 +1,6 @@
 # dev
+
+# v0.2.2
 - feat : rename tmp folder with specific suffix (useful when building several COG in the same folder at the same time)
 - feat : option use multithreading with gdal_translate
 - feat : file RELEASE_NOTES

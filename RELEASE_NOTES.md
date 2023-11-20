@@ -1,4 +1,6 @@
 # dev
+
+# v0.2.3
 - fixbug : delete cog if already exists (conflict on gdal_translate)
 
 # v0.2.2

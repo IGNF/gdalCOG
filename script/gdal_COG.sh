@@ -85,6 +85,9 @@ WARP_FOLDER="warp"
 echo
 echo Build a COG named : ${FILENAME}.${EXTENSION}
 
+# Deletes COG if exists
+rm -f $OUTPUT_DIR/$FILENAME.$EXTENSION
+
 # Creates temporary folder
 mkdir $OUTPUT_DIR/$TEMP -p
 

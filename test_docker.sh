@@ -9,7 +9,7 @@ EXTENSION="tif"
 EPSG="epsg:2154"
 
 # Temporary folder
-TEMP="tmp"
+TEMP="tmp_COG_test_docker_real"
 
 # Creates output folder
 mkdir $OUTPUT_DIR -p
@@ -22,7 +22,7 @@ lidar_hd/cog:$VERSION \
 ./gdalCOG/script/gdal_COG.sh -i /input -o /output -p $EPSG -f $FILENAME -e $EXTENSION -r -w
 
 # path to test
-PATH_TMP=$OUTPUT_DIR/tmp
+PATH_TMP=$OUTPUT_DIR/$TEMP
 PATH_WARP=$PATH_TMP/warp
 PATH_COG=$OUTPUT_DIR/$FILENAME.$EXTENSION
 

@@ -11,10 +11,6 @@ USE_GDALWARP=0
 REMOVE_TMP_FILES=0
 THREADS=1
 
-# Temporary folder
-TEMP="tmp"
-WARP_FOLDER="warp"
-
 # Message help
 usage(){
 >&2 cat << EOF
@@ -80,6 +76,10 @@ if [ $OUTPUT_DIR = None ]; then
     usage
     exit 2;
 fi
+
+# Temporary folder
+TEMP="tmp_$FILENAME"
+WARP_FOLDER="warp"
 
 # Info user
 echo

@@ -28,12 +28,13 @@ Optional
    [ -w | --warp        (use of gdalwarp  -> default without)     ]
    [ -r | --remove      (remove tmp files -> default without)     ]
    [ -m | --multithread (use all cpus     -> default without)     ]
+   [ -s | --resampling  (resampling       -> default nearest)     ]
 EOF
 exit 1
 }
 
 # Parse arguments
-PARSED_ARGUMENTS=$(getopt -o hi:o:p:e:f:wrm --long input:,output:,help,projection:,extension:,filename:,warp,remove,multithread -- "$@")
+PARSED_ARGUMENTS=$(getopt -o hi:o:p:e:f:wrms: --long input:,output:,help,projection:,extension:,filename:,warp,remove,multithread,resampling: -- "$@")
 
 eval set -- ${PARSED_ARGUMENTS}
 while :
@@ -48,6 +49,7 @@ do
     -w | --warp)        USE_GDALWARP=1      ; shift   ;;
     -r | --remove)      REMOVE_TMP_FILES=1  ; shift   ;;
     -m | --multithread) THREADS="all_cpus"  ; shift   ;;
+    -s | --resampling)  RESAMPLING="$2"     ; shift 2 ;;
     # -- means the end of the arguments; drop this, and break out of the while loop
     --) shift; break ;;
     *) >&2 echo Unsupported option: $1
@@ -119,6 +121,7 @@ fi
 
 # VRT
 echo Step 2/3 : Build VRT with gdalbuildvrt
+echo gdalbuildvrt -input_file_list $OUTPUT_DIR/$TEMP/$FILENAME.txt $OUTPUT_DIR/$TEMP/$FILENAME.vrt
 gdalbuildvrt -input_file_list $OUTPUT_DIR/$TEMP/$FILENAME.txt $OUTPUT_DIR/$TEMP/$FILENAME.vrt
 
 # COG
@@ -127,9 +130,22 @@ echo Step 3/3 : Build COG with gdal_translate
 # BIGTIFF=[YES/NO/IF_NEEDED/IF_SAFER] : YES forces BigTIFF instead of classic TIFF because image will be larger than 4GB.
 # COMPRESS=[NONE/LZW/JPEG/DEFLATE/ZSTD/WEBP/LERC/LERC_DEFLATE/LERC_ZSTD/LZMA] : LZW/DEFLATE/ZSTD compressions can be used with the PREDICTOR creation option. ZSTD compress more.
 # PREDICTOR=[YES/NO/STANDARD/FLOATING_POINT] : YES => standard predictor=2 (use if integer data type) instead of predictor=3 (use if floating point data type but less efficient here)
+echo gdal_translate \
+--config GDAL_DISABLE_READDIR_ON_OPEN TRUE \
+-co BIGTIFF=YES \
+-co RESAMPLING=$RESAMPLING \
+-co COMPRESS=LZW \
+-co PREDICTOR=YES \
+-co NUM_THREADS=$THREADS \
+-a_srs $EPSG \
+-of COG \
+$OUTPUT_DIR/$TEMP/$FILENAME.vrt \
+$OUTPUT_DIR/$FILENAME.$EXTENSION
+
 gdal_translate \
 --config GDAL_DISABLE_READDIR_ON_OPEN TRUE \
 -co BIGTIFF=YES \
+-co RESAMPLING=$RESAMPLING \
 -co COMPRESS=LZW \
 -co PREDICTOR=YES \
 -co NUM_THREADS=$THREADS \

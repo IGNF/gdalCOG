@@ -1,5 +1,5 @@
 # dev
-- newdev : compression, predictor and resampling now in option. Default compression is still `LZW`. Default predictor is now `NO`. Default resampling is `NEAREST`.
+- newdev : compression, predictor and resampling now in option. Default compression is still `LZW`. Default predictor is now `NO`. Default resampling is `CUBIC`(same as in previous versions).
 - newdev : set resampling to nearest (different with gdal, where : "Resampling method used for overview generation or reprojection. For paletted images, NEAREST is used by default, otherwise it is CUBIC.")
 
 # v0.2.3
